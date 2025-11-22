@@ -18,6 +18,9 @@ public class Product {
   @NotNull
   private BigDecimal price;
 
+  @Column(name = "description")
+  private String desc;
+
   public long getId() {
     return id;
   }
@@ -40,5 +43,13 @@ public class Product {
 
   public void setPrice(BigDecimal price) {
     this.price = price;
+  }
+
+  public String getDesc() {
+    return desc;
+  }
+  
+  public void setDesc(String desc) {
+    this.desc = desc;
   }
 }
