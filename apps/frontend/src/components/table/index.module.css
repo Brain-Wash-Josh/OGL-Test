@@ -1,0 +1,60 @@
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(11,59,90,0.06);
+}
+.table th {
+  background: linear-gradient(90deg, #0a2540 0%, #0b3b5a 100%);
+  color: #ffffff;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.table td {
+  border-top: 1px solid #eef2f4;
+  padding: 0.5rem 1rem;
+  vertical-align: middle;
+}
+.cellInput {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #07203a;
+}
+.cellText {
+  padding: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #07203a;
+}
+.rowActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.addRowBtn {
+  margin-top: 0.75rem;
+  background: #0b3b5a;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+.addRowBtn:hover { opacity: 0.95; }
+.smallMuted {
+  color: #6b7a86;
+  font-size: 0.85rem;
+}

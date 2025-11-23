@@ -1,0 +1,29 @@
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f6f8fa;
+  color: #0b3b5a;
+}
+.content {
+  flex: 1 0 auto;
+  padding: 2rem 1rem;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(11,59,90,0.06);
+  padding: 2rem;
+}
+.title {
+  font-size: 1.75rem;
+  color: #07203a;
+  margin: 0 0 1rem 0;
+}
+.lead {
+  color: #30475a;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
