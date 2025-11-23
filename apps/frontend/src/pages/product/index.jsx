@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Page from '../../components/page';
+import css from './index.module.css';
 import Table from '../../components/table';
 
 const columns = [
@@ -13,6 +14,99 @@ const ProductPage = () => {
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const originalRef = useRef([]);
+	const [saving, setSaving] = useState(false);
+	const [saveMessage, setSaveMessage] = useState(null);
+
+	const saveChanges = async () => {
+		setSaving(true);
+		setSaveMessage(null);
+		const original = Array.isArray(originalRef.current) ? originalRef.current : [];
+		const origById = new Map(original.filter(Boolean).map((r) => [String(r.id), r]));
+
+		const rowsToUpdate = [];
+		const rowsToCreate = [];
+
+        console.log('Saving data:', data);
+
+		data.forEach((row, idx) => {
+			const id = row && (row.id ?? row.id === 0 ? String(row.id) : '') ;
+			if (!id) {
+				rowsToCreate.push({ row, idx });
+			} else if (!origById.has(String(id))) {
+				// id present but not in original -> treat as new
+				rowsToCreate.push({ row, idx });
+			} else {
+				const orig = origById.get(String(id));
+				try {
+					if (JSON.stringify(orig) !== JSON.stringify(row)) {
+						rowsToUpdate.push({ row, idx });
+					}
+				} catch (e) {
+					rowsToUpdate.push({ row, idx });
+				}
+			}
+		});
+
+		if (rowsToCreate.length === 0 && rowsToUpdate.length === 0) {
+			setSaveMessage('No changes to save.');
+			setSaving(false);
+			return;
+		}
+
+		const errors = [];
+		for (const item of rowsToUpdate) {
+			const { row, idx } = item;
+			try {
+				const res = await fetch('http://localhost:8080/product', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(row),
+				});
+				if (!res.ok) {
+					const text = await res.text();
+					errors.push(`Update id=${row.id}: ${res.status} ${text}`);
+				} else {
+					const updated = await res.json().catch(() => row);
+					// update originalRef and local data
+					originalRef.current = originalRef.current.map((o) => (String(o.id) === String(row.id) ? updated : o));
+					setData((prev) => prev.map((p, i) => (i === idx ? updated : p)));
+				}
+			} catch (err) {
+				errors.push(`Update id=${row.id}: ${err.message}`);
+			}
+		}
+
+		// then create new rows (POST to /product)
+		for (const item of rowsToCreate) {
+			const { row, idx } = item;
+			try {
+				const res = await fetch('http://localhost:8080/product', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(row),
+				});
+				if (!res.ok) {
+					const text = await res.text();
+					errors.push(`Create row index=${idx}: ${res.status} ${text}`);
+				} else {
+					const created = await res.json().catch(() => row);
+					// append to originalRef and replace local row with returned record (which may include id)
+					originalRef.current = [...originalRef.current, created];
+					setData((prev) => prev.map((p, i) => (i === idx ? created : p)));
+				}
+			} catch (err) {
+				errors.push(`Create row index=${idx}: ${err.message}`);
+			}
+		}
+
+		setSaving(false);
+		if (errors.length === 0) {
+			setSaveMessage('Save complete.');
+		} else {
+			setSaveMessage(`Save finished with errors:\n${errors.join('; ')}`);
+		}
+	};
 
 	useEffect(() => {
 		let mounted = true;
@@ -24,7 +118,9 @@ const ProductPage = () => {
 			})
 			.then((json) => {
 				if (!mounted) return;
-				setData(Array.isArray(json) ? json : []);
+				const arr = Array.isArray(json) ? json : [];
+				setData(arr);
+				originalRef.current = arr;
 				setLoading(false);
 			})
 			.catch((err) => {
@@ -38,13 +134,35 @@ const ProductPage = () => {
 		};
 	}, []);
 
+
 	return (
 		<Page title="Product Title">
+			{saveMessage && <p style={{ color: saving ? '#333' : 'green' }}>{saveMessage}</p>}
 			{loading && <p>Loading products...</p>}
 			{error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
 			{!loading && !error && (
-				<Table columns={columns} data={data} onChange={(next) => setData(next)} />
+				<>
+					<div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem', gap: '0.5rem' }}>
+						<button
+							className={css.saveButton}
+							onClick={async () => {
+								// save handler defined below
+								if (saving) return;
+								setSaveMessage(null);
+								await saveChanges();
+							}}
+							disabled={saving}
+						>
+							{saving ? 'Saving...' : 'Save Changes'}
+						</button>
+					</div>
+					<Table
+						columns={columns}
+						data={data}
+						onChange={(next) => setData(next)}
+					/>
+				</>
 			)}
 		</Page>
 	);
