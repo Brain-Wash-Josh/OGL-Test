@@ -27,15 +27,14 @@ const ProductPage = () => {
 		const rowsToUpdate = [];
 		const rowsToCreate = [];
 
-        console.log('Saving data:', data);
-
 		data.forEach((row, idx) => {
 			const id = row && (row.id ?? row.id === 0 ? String(row.id) : '') ;
 			if (!id) {
 				rowsToCreate.push({ row, idx });
 			} else if (!origById.has(String(id))) {
-				// id present but not in original -> treat as new
-				rowsToCreate.push({ row, idx });
+				//id present but not in original
+				//rowsToCreate.push({ row, idx }); 
+                //skip for because we don't want to create duplicates
 			} else {
 				const orig = origById.get(String(id));
 				try {
@@ -136,7 +135,7 @@ const ProductPage = () => {
 
 
 	return (
-		<Page title="Product Title">
+		<Page title="Product Page">
 			{saveMessage && <p style={{ color: saving ? '#333' : 'green' }}>{saveMessage}</p>}
 			{loading && <p>Loading products...</p>}
 			{error && <p style={{ color: 'red' }}>Error: {error}</p>}
