@@ -68,7 +68,7 @@ const Table = ({ columns = [], data = [], onChange }) => {
         <button type="button" className={css.addRowBtn} onClick={addRow}>
           + Add row
         </button>
-        <div className={css.smallMuted}>Values are editable; column titles are fixed.</div>
+        <div className={css.smallMuted}>Values are editable; ID are fixed.</div>
       </div>
     </div>
   );
