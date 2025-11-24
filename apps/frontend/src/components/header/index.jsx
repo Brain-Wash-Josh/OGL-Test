@@ -7,13 +7,13 @@ const Header = () => {
 
 	return (
 		<header className={css.header}>
-			<div className={css.brand} onClick={() => navigate('/main')} style={{cursor: 'pointer'}}>
+			<div className={css.brand} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
 				<div className={css.logo}>OGL</div>
 				<div className={css.title}>OGL Developer Test</div>
 			</div>
 
 			<nav className={css.nav}>
-				<NavLink to="/main" className={({isActive}) => isActive ? `${css.navLink} ${css.active}` : css.navLink}>
+				<NavLink to="/" className={({isActive}) => isActive ? `${css.navLink} ${css.active}` : css.navLink}>
 					Main
 				</NavLink>
 				<NavLink to="/product" className={({isActive}) => isActive ? `${css.navLink} ${css.active}` : css.navLink}>
@@ -21,6 +21,9 @@ const Header = () => {
 				</NavLink>
 				<NavLink to="/customer" className={({isActive}) => isActive ? `${css.navLink} ${css.active}` : css.navLink}>
 					Customer
+				</NavLink>
+                <NavLink to="/map" className={({isActive}) => isActive ? `${css.navLink} ${css.active}` : css.navLink}>
+					Map
 				</NavLink>
 			</nav>
 		</header>
