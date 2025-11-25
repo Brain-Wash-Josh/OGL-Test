@@ -1,5 +1,7 @@
 package com.ogl.devtest.customer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.ogl.devtest.map.Geocoding;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,9 +12,11 @@ import java.util.Optional;
 @RequestMapping("/customer")
 public class CustomerController {
     private final CustomerRepository customerRepository;
-    
-    public CustomerController(CustomerRepository customerRepository) {
+    private final Geocoding geocoding;
+
+    public CustomerController(CustomerRepository customerRepository, Geocoding geocoding) {
         this.customerRepository = customerRepository;
+        this.geocoding = geocoding;
     }
     
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -33,6 +37,29 @@ public class CustomerController {
         if (!isValidPostcode) {
             return ResponseEntity.badRequest().build();
         }
+
+        try {
+            JsonNode geoData = geocoding.getCoordinates(
+                customer.getHouse(),
+                customer.getStreet(),
+                customer.getCity(),
+                customer.getPostcode()
+            );
+
+            System.out.println("Geocoding Data: " + geoData.toString());
+
+            if (geoData != null) {
+                customer.setLatitude(geoData.get("lat").asDouble());
+                customer.setLongitude(geoData.get("lon").asDouble());
+            } else {
+                return ResponseEntity.status(502).build();
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(502).build();
+        }
+        
+    
         return ResponseEntity.ok(customerRepository.save(customer));
     }
     

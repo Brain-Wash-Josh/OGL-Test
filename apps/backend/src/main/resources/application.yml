@@ -4,3 +4,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+
+geocoding:
+  api:
+    key: 69259bdbd8848166040755kiqc8ad0f
+    url: https://geocode.maps.co/search
